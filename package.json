@@ -1,0 +1,21 @@
+{
+   "name": "rubedo-rl",
+   "version": "0.1.0",
+   "description": "survival roguelike",
+   "author": "Simon Meskens",
+   "license": "ISC",
+   "dependencies": {},
+   "devDependencies": {
+      "browserify": "^14.4.0",
+      "prettier": "1.5.2",
+      "tsify": "^3.0.1",
+      "tslint": "^5.7.0",
+      "tslint-config-standard": "^6.0.1",
+      "typescript": "^2.5.2",
+      "watchify": "^3.9.0"
+   },
+   "scripts": {
+      "build": "watchify src/index.ts -p tsify -o dist/bundle.js -d",
+      "format": "prettier --write --print-width 80 --tab-width 3 \"src/**/*.ts\""
+   }
+}

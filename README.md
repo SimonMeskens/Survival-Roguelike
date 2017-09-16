@@ -1,1 +1,1 @@
-RL
+Small Roguelike for testing out some ideas

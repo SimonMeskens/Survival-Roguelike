@@ -1,0 +1,12 @@
+{
+   "extends": "tslint-config-standard",
+   "rules": {
+      "space-before-function-paren": false,
+      "no-use-before-declare": false,
+      "variable-name": false,
+      "quotemark": [true, "double"],
+      "ter-indent": false,
+      "semicolon": [true, "always"],
+      "no-unused-variable": true
+   }
+}
