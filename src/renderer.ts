@@ -44,49 +44,49 @@ const drawEntity = (
 };
 
 export const render = ({
+   ctx,
    camera,
    animState
 }: {
+   ctx: CanvasRenderingContext2D;
    camera: Camera;
    animState: number;
 }) => {
-   const ctx = camera.canvas.getContext("2d");
+   ctx.imageSmoothingEnabled = false;
 
-   if (ctx !== null) {
-      ctx.fillStyle = "black";
-      ctx.fillRect(0, 0, camera.canvas.width, camera.canvas.height);
+   ctx.fillStyle = "black";
+   ctx.fillRect(0, 0, camera.canvas.width, camera.canvas.height);
 
-      const sprites: {
-         [key: number]: Entity<
-            string,
-            { sprite: Sprite | Sprite[]; location: Point3D }
-         >[];
-      } = Object.create(null);
+   const sprites: {
+      [key: number]: Entity<
+         string,
+         { sprite: Sprite | Sprite[]; location: Point3D }
+      >[];
+   } = Object.create(null);
 
-      for (const node of camera.scene.nodes) {
-         const entity = node.entity;
-         if (
-            isSpriteEntity(entity) &&
-            isTangibleEntity(entity) &&
-            isOverlap(camera, entity.location)
-         ) {
-            sprites[entity.location.z] = sprites[entity.location.z] || [];
+   for (const node of camera.scene.nodes) {
+      const entity = node.entity;
+      if (
+         isSpriteEntity(entity) &&
+         isTangibleEntity(entity) &&
+         isOverlap(camera, entity.location)
+      ) {
+         sprites[entity.location.z] = sprites[entity.location.z] || [];
 
-            sprites[entity.location.z].push(entity);
-         }
+         sprites[entity.location.z].push(entity);
       }
+   }
 
-      for (const z in sprites) {
-         for (const sprite of sprites[z]) {
-            drawEntity(
-               ctx,
-               sprite,
-               animState,
-               camera.tileSize,
-               sprite.location.x - camera.x,
-               sprite.location.y - camera.y
-            );
-         }
+   for (const z in sprites) {
+      for (const sprite of sprites[z]) {
+         drawEntity(
+            ctx,
+            sprite,
+            animState,
+            camera.tileSize,
+            sprite.location.x - camera.x,
+            sprite.location.y - camera.y
+         );
       }
    }
 };

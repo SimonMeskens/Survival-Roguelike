@@ -3,11 +3,13 @@ import { createScene, addChild } from "./scene";
 import { createSprite, SpriteEntity, Sprite } from "./sprite";
 import { Point3D } from "./geometry";
 import { extendEntity, Entity } from "./entity";
+import { Camera } from "./renderer";
 
 export const scene = createScene();
 
-export const playerCamera = {
+const playerCamera = {
    scene: scene,
+   canvas: null as HTMLCanvasElement | null,
    tileSize: 48,
    x: 0,
    y: 0,
@@ -16,6 +18,54 @@ export const playerCamera = {
    focus: {
       width: 6,
       height: 6
+   }
+};
+
+export const createPlayerCamera = (canvas: HTMLCanvasElement) => {
+   playerCamera.canvas = canvas;
+
+   centerCamera();
+
+   return playerCamera;
+};
+
+export const centerCamera = () => {
+   if (player) {
+      const cameraMarginX = Math.floor(
+         (playerCamera.width - playerCamera.focus.width) / 2
+      );
+      const cameraMarginY = Math.floor(
+         (playerCamera.height - playerCamera.focus.height) / 2
+      );
+      if (
+         player.location.x >=
+         playerCamera.focus.width + playerCamera.x + cameraMarginX
+      ) {
+         playerCamera.x =
+            player.location.x + 1 - playerCamera.focus.width - cameraMarginX;
+      }
+      if (
+         player.location.y >=
+         playerCamera.focus.height + playerCamera.y + cameraMarginY
+      ) {
+         playerCamera.y =
+            player.location.y + 1 - playerCamera.focus.height - cameraMarginY;
+      }
+      if (player.location.x < playerCamera.x + cameraMarginX) {
+         playerCamera.x = player.location.x - cameraMarginX;
+      }
+      if (player.location.y < playerCamera.y + cameraMarginY) {
+         playerCamera.y = player.location.y - cameraMarginY;
+      }
+   }
+
+   if (playerCamera.canvas) {
+      playerCamera.width = Math.ceil(
+         playerCamera.canvas.width / playerCamera.tileSize
+      );
+      playerCamera.height = Math.ceil(
+         playerCamera.canvas.height / playerCamera.tileSize
+      );
    }
 };
 
@@ -110,35 +160,18 @@ export const handleInput = (keysPressed: { [key: number]: boolean }) => {
       player.location.x += vecMovement[0];
       player.location.y += vecMovement[1];
 
-      const cameraMarginX = Math.floor(
-         (playerCamera.width - playerCamera.focus.width) / 2
-      );
-      const cameraMarginY = Math.floor(
-         (playerCamera.height - playerCamera.focus.height) / 2
-      );
-      if (
-         player.location.x >=
-         playerCamera.focus.width + playerCamera.x + cameraMarginX
-      ) {
-         playerCamera.x =
-            player.location.x + 1 - playerCamera.focus.width - cameraMarginX;
-      }
-      if (
-         player.location.y >=
-         playerCamera.focus.height + playerCamera.y + cameraMarginY
-      ) {
-         playerCamera.y =
-            player.location.y + 1 - playerCamera.focus.height - cameraMarginY;
-      }
-      if (player.location.x < playerCamera.x + cameraMarginX) {
-         playerCamera.x = player.location.x - cameraMarginX;
-      }
-      if (player.location.y < playerCamera.y + cameraMarginY) {
-         playerCamera.y = player.location.y - cameraMarginY;
-      }
-
       turnTaken = true;
    }
 
    return turnTaken;
+};
+
+export const preRender = ({
+   camera,
+   animState
+}: {
+   camera: Camera;
+   animState: number;
+}) => {
+   centerCamera();
 };

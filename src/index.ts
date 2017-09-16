@@ -1,25 +1,16 @@
 import { render, Camera } from "./renderer";
-import { KeyMap, handleInput, playerCamera } from "./game";
+import { KeyMap, handleInput, createPlayerCamera, preRender } from "./game";
 
 // Setup
 
 const $canvas = document.createElement("canvas");
-const ctx: CanvasRenderingContext2D = (() => {
-   const context = $canvas.getContext("2d");
 
-   if (context === null) throw new Error("No context!");
-   else return context as CanvasRenderingContext2D;
-})();
-
-$canvas.width = 576;
-$canvas.height = 576;
+$canvas.width = innerWidth;
+$canvas.height = innerHeight;
 $canvas.style.position = "absolute";
 $canvas.style.top = "0";
 $canvas.style.left = "0";
-$canvas.style.bottom = "0";
-$canvas.style.right = "0";
-$canvas.style.margin = "auto";
-ctx.imageSmoothingEnabled = false;
+$canvas.style.margin = "0";
 
 document.body.appendChild($canvas);
 
@@ -91,12 +82,9 @@ const time = {
    animResolution: 500
 };
 
-const camera = (camera => {
-   camera.canvas = $canvas;
-   return camera;
-})((playerCamera as any) as Camera);
+const camera = createPlayerCamera($canvas) as Camera;
 
-requestAnimationFrame(function loop() {
+const loop = () => {
    if (time.start === 0) time.start = performance.now();
    time.curTime = performance.now();
    const deltaTime = time.curTime - time.prevTime;
@@ -107,13 +95,22 @@ requestAnimationFrame(function loop() {
    input();
 
    if (time.prevTime !== 0) {
-      render({
-         camera,
-         animState: time.animState
-      });
+      $canvas.width = innerWidth;
+      $canvas.height = innerHeight;
+      const ctx = $canvas.getContext("2d");
+      if (ctx) {
+         preRender({ camera, animState: time.animState });
+         render({
+            ctx,
+            camera,
+            animState: time.animState
+         });
+      }
    }
 
    stats.update();
    requestAnimationFrame(loop);
    time.prevTime = time.curTime;
-});
+};
+
+loop();
